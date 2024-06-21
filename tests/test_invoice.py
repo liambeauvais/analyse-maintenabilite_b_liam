@@ -1,7 +1,7 @@
 from invoice import CarTypeAmount, Rental, Customer, Car
 
 
-def test_invoice():
+def create_customer():
     car1 = Car("Car 1", CarTypeAmount.REGULAR)
     car2 = Car("Car 2", CarTypeAmount.NEW_MODEL)
 
@@ -11,7 +11,16 @@ def test_invoice():
     customer = Customer("John Doe")
     customer.add_rental(rental1)
     customer.add_rental(rental2)
+    return customer
 
-    customer_invoice = customer.invoice()
+
+def test_invoice_as_str():
+    customer = create_customer()
+
+    customer_invoice = customer.invoice(format="string")
     assert customer_invoice == ("Rental Record for John Doe\n\tCar 1	335.0\n\tCar 2	390.0\nAmount owed is 725.0\nYou "
                                 "earned 3 frequent renter points\n")
+
+
+def test_invoice_as_json():
+    pass

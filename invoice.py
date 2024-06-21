@@ -54,18 +54,6 @@ class Rental:
         return renter_points
 
 
-class Invoice:
-    def __init__(self, rentals: list[Rental]):
-        self.renter_points = 0
-        self.rentals = rentals
-
-    def as_pdf(self):
-        pass
-
-    def as_json(self):
-        pass
-
-
 class Customer:
     def __init__(self, name):
         self._name = name
@@ -77,25 +65,43 @@ class Customer:
     def get_name(self):
         return self._name
 
-    def invoice(self):
-        total_amount = 0.0
-        frequent_renter_points = 0
-        result = f"Rental Record for {self.get_name()}\n"
+    def invoice(self, format: str):
+        invoice = Invoice(format, self)
+        return invoice.render()
 
-        for rental in self._rentals:
+    def get_rentals(self):
+        return self._rentals
 
+
+class Invoice:
+    def __init__(self, format: str, customer: Customer):
+        self.renter_points = 0
+        self.total_amount = 0
+        self.format = format
+        self.customer = customer
+
+    def render(self):
+        match self.format:
+            case "string":
+                return self.as_str()
+            case "json":
+                return self.as_json()
+
+    def as_str(self):
+        result = f"Rental Record for {self.customer.get_name()}\n"
+        for rental in self.customer.get_rentals():
             # Add frequent renter points
-            frequent_renter_points += rental.get_renter_points()
+            self.renter_points += rental.get_renter_points()
 
             # Show figures for this rental
             result += f"\t{rental.get_car().get_title()}\t{rental.get_rental_amount() / 100:.1f}\n"
-            total_amount += rental.get_rental_amount()
-
-        # Add footer lines
-        result += f"Amount owed is {total_amount / 100:.1f}\n"
-        result += f"You earned {frequent_renter_points} frequent renter points\n"
-
+            self.total_amount += rental.get_rental_amount()
+        result += f"Amount owed is {self.total_amount / 100:.1f}\n"
+        result += f"You earned {self.renter_points} frequent renter points\n"
         return result
+
+    def as_json(self):
+        pass
 
 
 # Examples of usage:
@@ -109,4 +115,4 @@ customer = Customer("John Doe")
 customer.add_rental(rental1)
 customer.add_rental(rental2)
 
-print(customer.invoice())
+print(customer.invoice(format="string"))
