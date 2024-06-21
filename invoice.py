@@ -44,6 +44,15 @@ class Rental:
 
         return rental_amount
 
+    def get_renter_points(self):
+        renter_points = 1
+
+        # Add bonus for a two-day new release rental
+        if self.get_car().get_price_code() == CarTypeAmount.NEW_MODEL and self.get_days_rented() > 1:
+            renter_points += 1
+
+        return renter_points
+
 
 class Invoice:
     def __init__(self, rentals: list[Rental]):
@@ -76,11 +85,7 @@ class Customer:
         for rental in self._rentals:
 
             # Add frequent renter points
-            frequent_renter_points += 1
-
-            # Add bonus for a two-day new release rental
-            if rental.get_car().get_price_code() == CarTypeAmount.NEW_MODEL and rental.get_days_rented() > 1:
-                frequent_renter_points += 1
+            frequent_renter_points += rental.get_renter_points()
 
             # Show figures for this rental
             result += f"\t{rental.get_car().get_title()}\t{rental.get_rental_amount() / 100:.1f}\n"
