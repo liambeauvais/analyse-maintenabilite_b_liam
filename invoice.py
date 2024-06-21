@@ -1,3 +1,4 @@
+import math
 from enum import Enum
 
 
@@ -42,10 +43,14 @@ class Rental:
         if self.get_days_rented() > 3:
             rental_amount -= (self.get_days_rented() - 2) * 10000
 
-        return rental_amount
+        return round(rental_amount / 100, 1)
 
     def get_renter_points(self):
         renter_points = 1
+
+        rounded_up = math.ceil(self.get_rental_amount() / 10)
+        print(rounded_up)
+        renter_points += rounded_up
 
         # Add bonus for a two-day new release rental
         if self.get_car().get_price_code() == CarTypeAmount.NEW_MODEL and self.get_days_rented() > 1:
@@ -94,9 +99,9 @@ class Invoice:
             self.renter_points += rental.get_renter_points()
 
             # Show figures for this rental
-            result += f"\t{rental.get_car().get_title()}\t{rental.get_rental_amount() / 100:.1f}\n"
+            result += f"\t{rental.get_car().get_title()}\t{rental.get_rental_amount()}\n"
             self.total_amount += rental.get_rental_amount()
-        result += f"Amount owed is {self.total_amount / 100:.1f}\n"
+        result += f"Amount owed is {self.total_amount}\n"
         result += f"You earned {self.renter_points} frequent renter points\n"
         return result
 
@@ -115,12 +120,12 @@ class Invoice:
             result["cars"].append(
                 dict(
                     name=rental.get_car().get_title(),
-                    amount=round(rental.get_rental_amount() / 100, 1),
+                    amount=round(rental.get_rental_amount()),
                 )
             )
             self.total_amount += rental.get_rental_amount()
         result["renter_points"] = self.renter_points
-        result["total_amount"] = round(self.total_amount / 100, 1)
+        result["total_amount"] = round(self.total_amount)
         return result
 
 

@@ -19,7 +19,7 @@ def test_invoice_as_str():
 
     customer_invoice = customer.invoice(format="string")
     assert customer_invoice == ("Rental Record for John Doe\n\tCar 1	335.0\n\tCar 2	390.0\nAmount owed is 725.0\nYou "
-                                "earned 3 frequent renter points\n")
+                                "earned 76 frequent renter points\n")
 
 
 def test_invoice_as_json():
@@ -27,7 +27,7 @@ def test_invoice_as_json():
     customer_invoice = customer.invoice(format="json")
     assert customer_invoice == {
         'name': 'John Doe',
-        'renter_points': 3,
+        'renter_points': 76,
         'total_amount': 725.0,
         'cars': [{'name': 'Car 1', 'amount': 335.0}, {'name': 'Car 2', 'amount': 390.0}]
     }
