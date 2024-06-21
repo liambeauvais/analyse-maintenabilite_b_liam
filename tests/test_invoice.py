@@ -23,4 +23,11 @@ def test_invoice_as_str():
 
 
 def test_invoice_as_json():
-    pass
+    customer = create_customer()
+    customer_invoice = customer.invoice(format="json")
+    assert customer_invoice == {
+        'name': 'John Doe',
+        'renter_points': 3,
+        'total_amount': 725.0,
+        'cars': [{'name': 'Car 1', 'amount': 335.0}, {'name': 'Car 2', 'amount': 390.0}]
+    }

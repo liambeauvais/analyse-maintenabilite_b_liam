@@ -101,7 +101,27 @@ class Invoice:
         return result
 
     def as_json(self):
-        pass
+        result = dict(
+            name=self.customer.get_name(),
+            renter_points=0,
+            total_amount=0.0,
+            cars=[]
+        )
+        for rental in self.customer.get_rentals():
+            # Add frequent renter points
+            self.renter_points += rental.get_renter_points()
+
+            # Show figures for this rental
+            result["cars"].append(
+                dict(
+                    name=rental.get_car().get_title(),
+                    amount=round(rental.get_rental_amount() / 100, 1),
+                )
+            )
+            self.total_amount += rental.get_rental_amount()
+        result["renter_points"] = self.renter_points
+        result["total_amount"] = round(self.total_amount / 100, 1)
+        return result
 
 
 # Examples of usage:
@@ -115,4 +135,4 @@ customer = Customer("John Doe")
 customer.add_rental(rental1)
 customer.add_rental(rental2)
 
-print(customer.invoice(format="string"))
+print(customer.invoice(format="json"))
