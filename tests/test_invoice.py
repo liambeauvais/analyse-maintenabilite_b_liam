@@ -1,8 +1,9 @@
-from invoice import Car, Rental, Customer
+from invoice import CarTypeAmount, Rental, Customer, Car
+
 
 def test_invoice():
-    car1 = Car("Car 1", Car.REGULAR)
-    car2 = Car("Car 2", Car.NEW_MODEL)
+    car1 = Car("Car 1", CarTypeAmount.REGULAR)
+    car2 = Car("Car 2", CarTypeAmount.NEW_MODEL)
 
     rental1 = Rental(car1, 3)
     rental2 = Rental(car2, 2)

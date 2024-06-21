@@ -1,8 +1,14 @@
-class Car:
-    REGULAR = 0
-    NEW_MODEL = 1
+from enum import Enum
 
-    def __init__(self, title, price_code):
+
+class CarTypeAmount(Enum):
+    REGULAR = {"initial_price": 5000, "per_day_price": 9500}
+    NEW_MODEL = {"initial_price": 9000, "per_day_price": 15000}
+
+
+class Car:
+
+    def __init__(self, title, price_code: CarTypeAmount):
         self._title = title
         self._price_code = price_code
 
@@ -17,7 +23,7 @@ class Car:
 
 
 class Rental:
-    def __init__(self, car, days_rented):
+    def __init__(self, car: Car, days_rented: int):
         self._car = car
         self._days_rented = days_rented
 
@@ -26,6 +32,29 @@ class Rental:
 
     def get_car(self):
         return self._car
+
+    def get_rental_amount(self):
+        rental_amount = 0.0
+        price_codes = self._car.get_price_code()
+        rental_amount += price_codes.value["initial_price"] + self.get_days_rented() * price_codes.value[
+            "per_day_price"]
+
+        if self.get_days_rented() > 3:
+            rental_amount -= (self.get_days_rented() - 2) * 10000
+
+        return rental_amount
+
+
+class Invoice:
+    def __init__(self, rentals: list[Rental]):
+        self.renter_points = 0
+        self.rentals = rentals
+
+    def as_pdf(self):
+        pass
+
+    def as_json(self):
+        pass
 
 
 class Customer:
@@ -45,28 +74,17 @@ class Customer:
         result = f"Rental Record for {self.get_name()}\n"
 
         for rental in self._rentals:
-            this_amount = 0.0
-
-            # Determine amounts for each line
-            if rental.get_car().get_price_code() == Car.REGULAR:
-                this_amount += 5000 + rental.get_days_rented() * 9500
-                if rental.get_days_rented() > 5:
-                    this_amount -= (rental.get_days_rented() - 2) * 10000
-            elif rental.get_car().get_price_code() == Car.NEW_MODEL:
-                this_amount += 9000 + rental.get_days_rented() * 15000
-                if rental.get_days_rented() > 3:
-                    this_amount -= (rental.get_days_rented() - 2) * 10000
 
             # Add frequent renter points
             frequent_renter_points += 1
 
             # Add bonus for a two-day new release rental
-            if rental.get_car().get_price_code() == Car.NEW_MODEL and rental.get_days_rented() > 1:
+            if rental.get_car().get_price_code() == CarTypeAmount.NEW_MODEL and rental.get_days_rented() > 1:
                 frequent_renter_points += 1
 
             # Show figures for this rental
-            result += f"\t{rental.get_car().get_title()}\t{this_amount / 100:.1f}\n"
-            total_amount += this_amount
+            result += f"\t{rental.get_car().get_title()}\t{rental.get_rental_amount() / 100:.1f}\n"
+            total_amount += rental.get_rental_amount()
 
         # Add footer lines
         result += f"Amount owed is {total_amount / 100:.1f}\n"
@@ -76,8 +94,8 @@ class Customer:
 
 
 # Examples of usage:
-car1 = Car("Car 1", Car.REGULAR)
-car2 = Car("Car 2", Car.NEW_MODEL)
+car1 = Car("Car 1", CarTypeAmount.REGULAR)
+car2 = Car("Car 2", CarTypeAmount.NEW_MODEL)
 
 rental1 = Rental(car1, 3)
 rental2 = Rental(car2, 2)
